@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:36:43 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 18:23:33 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/10 19:02:55 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 # include	<stdio.h>
 # include	<stdlib.h>
 # include	<errno.h>
+
+# define ERR_ARGS "Invalid number of args.\n" 
 
 // PIPEX
 typedef struct s_pipe
@@ -35,6 +37,10 @@ typedef struct s_pipe
 	char	*execute_path;
 	char	**cmd_args;
 } t_pipe;
+
+// ERROR
+int msg_error(char *error);
+int	print_error(char *error);
 
 // LIB_FT
 void	ft_bzero(void *s, size_t n);
