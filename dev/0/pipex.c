@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 11:50:02 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 15:00:44 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/10 15:58:58 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,6 +227,7 @@ int	main(int argc, char **argv, char **envp)
 	pid_t	pid;
 	char	buf;
 	int		infile_fd;
+	int		outfile_fd;
 	char	*PATH;
 	char	*cmd;
 	char	**cmd_args;
@@ -264,23 +265,16 @@ int	main(int argc, char **argv, char **envp)
 		// # WRITE IN WRITE-END : STDOUT -> WRITE-END
 		// ## REDIRECTION STDOUT TO WRITE-END SIDE
 		dup2(pipe_fd[1],STDOUT_FILENO);
-		
-		// ## 1
-		// child_process(pipe_fd[1], argv[1]);
 
-		// ## 2 : HARD CODE PRINT
-		// printf("writing something from child\n");
-		// write(pipe_fd[1], argv[1],strlen(argv[1]));
-
-		// ## 3-USE EXECVE
-		cmd_args = ft_split(argv[2], ' ');
-		cmd = get_cmd(PATH_ARR,cmd_args[0]);
-		// printf("CMD : %s", cmd);
-		execve(cmd, cmd_args , NULL);
-
-		// ## 4-USE EXECVE-HARDCODE
+		// ## 1-EXECVE-HARDCODE
 		// char *args[] = {"/bin/ls", "-la", NULL};
 		// execve(args[0], args , NULL);
+
+		// ## 2-ACCEPT ARGV TO EXECVE
+		cmd_args = ft_split(argv[2], ' ');
+		cmd = get_cmd(PATH_ARR,cmd_args[0]);
+		execve(cmd, cmd_args , NULL);
+
 
 		// CLOSE WRITE-END SIDE : READ-END RECEIVE EOF
 		close(pipe_fd[1]);
@@ -291,15 +285,36 @@ int	main(int argc, char **argv, char **envp)
 
 	// PARENT : need to read from child
 	if(pid > 0) {
+
+		// TRY TO OPEN OUTFILE FILE
+		outfile_fd = open(argv[argc - 1], O_TRUNC | O_CREAT | O_RDWR, 0000644);
+
+		// CLOSE WRITE-END SIDE : NEED TO READ
 		close(pipe_fd[1]);
-		printf("W8 child\n");
+		
+		// NEED TO W8 ?
+		printf("W8 child Process\n");
 		wait(NULL);
-		while(read(pipe_fd[0],&buf,1) >0)
-		{
-			write(STDOUT_FILENO,&buf,1);
-		} 
-		printf("\nalready got message\n");
+
+		// REDIRECTION STDIN TO READ END SIDE
+		dup2(pipe_fd[0],STDIN_FILENO);
+
+		// REDIRECTION STOUT TO OUTFILE
+		dup2(outfile_fd,STDOUT_FILENO);
+
+
+
+		// EXECVE ARGV TO EXECVE
+		cmd_args = ft_split(argv[3], ' ');
+		cmd = get_cmd(PATH_ARR,cmd_args[0]);
+		execve(cmd, cmd_args , NULL);
+
+
+
+		// CLOSE READ-END SIDE
 		close(pipe_fd[0]);
+
+		// GRACEFULLY EXIT
 		exit(EXIT_SUCCESS);
 	}
 }
