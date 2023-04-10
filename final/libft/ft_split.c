@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:47:46 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 16:47:48 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/10 22:11:11 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ char	**ft_split(char const *s, char c)
 {
 	size_t	num_word;
 	char	**array_word;
-
 	if (!s)
 		return (NULL);
 	num_word = count_word(s, c);

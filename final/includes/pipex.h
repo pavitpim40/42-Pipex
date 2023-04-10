@@ -6,18 +6,34 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:36:43 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 19:02:55 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/10 22:05:04 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 # define PIPEX_H
 
-# include	<sys/wait.h>
-# include	<fcntl.h>
-# include	<unistd.h>
-# include	<stdio.h>
-# include	<stdlib.h>
+
+/* to write, read, close, access, pipe, dup, dup2, execve, fork */
+# include <unistd.h>
+# include <sys/types.h>
+# include <sys/uio.h>
+
+/* malloc, free, exit */
+# include <stdlib.h>
+
+/* open, unlink */
+# include <fcntl.h>
+
+/* waitpid, wait */
+# include <sys/wait.h>
+
+/* strerror */
+# include <string.h>
+
+/*to perror*/
+# include <stdio.h>
+
 # include	<errno.h>
 
 # define ERR_ARGS "Invalid number of args.\n" 
@@ -37,6 +53,9 @@ typedef struct s_pipe
 	char	*execute_path;
 	char	**cmd_args;
 } t_pipe;
+
+// FREE
+void	free_exec_args(t_pipe *t);
 
 // ERROR
 int msg_error(char *error);
