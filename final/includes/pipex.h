@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:36:43 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 16:59:26 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/10 18:23:33 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,20 @@
 # include	<errno.h>
 
 // PIPEX
-
+typedef struct s_pipe
+{
+	pid_t	pid_in;
+	pid_t	pid_out;
+	int		pipe_fd[2];
+	int		infile;
+	int		outfile;
+	pid_t	pid_first_child;
+	pid_t	pid_second_child;
+	char	*env_path;
+	char	**env_path_lists;
+	char	*execute_path;
+	char	**cmd_args;
+} t_pipe;
 
 // LIB_FT
 void	ft_bzero(void *s, size_t n);

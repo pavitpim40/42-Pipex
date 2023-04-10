@@ -6,20 +6,20 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:45:10 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 17:02:05 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/10 18:25:01 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-char	*find_path(char **envp)
+static char	*find_path(char **envp)
 {
 	while (ft_strncmp("PATH", *envp, 4))
 		envp++;
 	return (*envp + 5);
 }
 
-static char	*get_cmd(char **paths, char *cmd)
+static char	get_execute_path(char **paths, char *cmd)
 {
 	char	*tmp;
 	char	*command;
@@ -40,98 +40,50 @@ static char	*get_cmd(char **paths, char *cmd)
 
 int	main(int argc, char **argv, char **envp)
 {
-	int	pipe_fd	[2];
-	pid_t	pid;
-	// char	buf;
-	int		infile_fd;
-	int		outfile_fd;
-	char	*PATH;
-	char	*cmd;
-	char	**cmd_args;
-	
-	printf("ARGV-1 : %s\n", argv[1]);
-	printf("ARGV-2 : %s\n", argv[2]);
+	t_pipe	pipex;
 
-	// GET ENV:PATH -> SINGLE STRING
-	PATH = find_path(envp);
-
-	// GET ENV-PATH AFTER SPLIT BY ":" --> GOT ARRAY
-	char **PATH_ARR = ft_split(PATH,':');
+	// OPEN INFILE,OUTFILE
+	pipex.infile = open(argv[1],O_RDONLY);
+	pipex.outfile  = open(argv[argc - 1], O_TRUNC | O_CREAT | O_RDWR, 0000644);
+	pipex.env_path = find_path(envp);
+	pipex.env_path_lists = ft_split(pipex.env_path,':');
 
 	// OPEN NEW PIPE
-	if(pipe(pipe_fd) == -1)
+	if(pipe(pipex.pipe_fd) == -1)
 	{
 		perror("pipe");
 		exit(EXIT_FAILURE);
 	}
-	pid = fork();
-	// CHILD : need to write to parent
-	if (pid == 0) 
+	pipex.pid_first_child = fork();
+	if (pipex.pid_first_child == 0) 
 	{
-		// TRY TO OPEN INFILE FILE
-		infile_fd = open(argv[1],O_RDONLY);
-		// HANDLE ERROR WHEN CANNOT OPEN FILE
+		close(pipex.pipe_fd[0]);
+		dup2(pipex.infile,STDIN_FILENO);
+		dup2(pipex.pipe_fd[1],STDOUT_FILENO);
 
-		// CLOSE READ-END SIDE
-		close(pipe_fd[0]);
+		pipex.cmd_args = ft_split(argv[2], ' ');
+		pipex.execute_path =get_execute_path(pipex.env_path_lists ,pipex.cmd_args[0]);
+		execve(pipex.execute_path, pipex.cmd_args  , NULL);
 
-		// # REDIRECTION STDIN TO INFILE_FILE
-		dup2(infile_fd,STDIN_FILENO);
-		// # FIND CMD FOR STDIN BEFORE EXECUTE IN EXECVE
-		
-		// # WRITE IN WRITE-END : STDOUT -> WRITE-END
-		// ## REDIRECTION STDOUT TO WRITE-END SIDE
-		dup2(pipe_fd[1],STDOUT_FILENO);
-
-		// ## 1-EXECVE-HARDCODE
-		// char *args[] = {"/bin/ls", "-la", NULL};
-		// execve(args[0], args , NULL);
-
-		// ## 2-ACCEPT ARGV TO EXECVE
-		cmd_args = ft_split(argv[2], ' ');
-		cmd = get_cmd(PATH_ARR,cmd_args[0]);
-		execve(cmd, cmd_args , NULL);
-
-
-		// CLOSE WRITE-END SIDE : READ-END RECEIVE EOF
-		close(pipe_fd[1]);
-
-		// GRACEFULLY EXIT
+		close(pipex.pipe_fd[1]);
 		exit(EXIT_SUCCESS);
 	} 
 
-	// PARENT : need to read from child
-	if(pid > 0) {
+	pipex.pid_second_child = fork();
+	if(pipex.pid_second_child == 0) {
 
-		// TRY TO OPEN OUTFILE FILE
-		outfile_fd = open(argv[argc - 1], O_TRUNC | O_CREAT | O_RDWR, 0000644);
+		close(pipex.pipe_fd[1]);
+		dup2(pipex.pipe_fd[0],STDIN_FILENO);
+		dup2(pipex.outfile,STDOUT_FILENO);
 
-		// CLOSE WRITE-END SIDE : NEED TO READ
-		close(pipe_fd[1]);
-		
-		// NEED TO W8 ?
-		printf("W8 child Process\n");
-		// wait(NULL);
+		pipex.cmd_args = ft_split(argv[3], ' ');
+		pipex.execute_path =get_execute_path(pipex.env_path_lists ,pipex.cmd_args[0]);
+		execve(pipex.execute_path, pipex.cmd_args  , NULL);
 
-		// REDIRECTION STDIN TO READ END SIDE
-		dup2(pipe_fd[0],STDIN_FILENO);
-
-		// REDIRECTION STOUT TO OUTFILE
-		dup2(outfile_fd,STDOUT_FILENO);
-
-
-
-		// EXECVE ARGV TO EXECVE
-		cmd_args = ft_split(argv[3], ' ');
-		cmd = get_cmd(PATH_ARR,cmd_args[0]);
-		execve(cmd, cmd_args , NULL);
-
-
-
-		// CLOSE READ-END SIDE
-		close(pipe_fd[0]);
-
-		// GRACEFULLY EXIT
+		close(pipex.pipe_fd[0]);
 		exit(EXIT_SUCCESS);
 	}
+	waitpid(pipex.pid_first_child, NULL,0);
+	waitpid(pipex.pid_second_child, NULL,0);
+	return(0);
 }
