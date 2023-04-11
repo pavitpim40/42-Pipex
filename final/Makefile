@@ -10,7 +10,7 @@ HEADER_DIR		=	includes/
 HEADER			=	$(addprefix $(HEADER_DIR), $(HEADER_SRCS))
 
 #MANDATORY
-MAND_SRCS		=	pipex.c error.c free.c
+MAND_SRCS		=	pipex.c error.c free.c path.c childs.c
 MAND_PATH_DIR	=	mandatory/
 MAND_PATH		=	$(addprefix $(MAND_PATH_DIR), $(MAND_SRCS))
 MAND_OBJ		=	$(MAND_PATH:.c=.o)

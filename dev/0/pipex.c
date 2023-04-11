@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 11:50:02 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 15:58:58 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/10 16:04:11 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,7 +294,7 @@ int	main(int argc, char **argv, char **envp)
 		
 		// NEED TO W8 ?
 		printf("W8 child Process\n");
-		wait(NULL);
+		// wait(NULL);
 
 		// REDIRECTION STDIN TO READ END SIDE
 		dup2(pipe_fd[0],STDIN_FILENO);
