@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 16:01:37 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/11 16:03:29 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/11 20:53:35 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ void	first_child_process(t_pipe t, char **argv, char **envp)
 	t.execute_path = get_execute_path(t.env_path_lists ,t.cmd_args[0]);
 	if(!t.execute_path)
 	{
+		write(2,t.cmd_args[0],ft_strlen(t.cmd_args[0]));
+		write(2,": ",2);
 		free_exec_args(&t);
 		msg_error(ERR_CMD);
 		exit(127);
@@ -54,6 +56,8 @@ void	second_child_process(t_pipe t,int argc, char **argv, char **envp)
 	t.execute_path = get_execute_path(t.env_path_lists ,t.cmd_args[0]);
 	if(!t.execute_path)
 	{
+		write(2,t.cmd_args[0],ft_strlen(t.cmd_args[0]));
+		write(2,": ",2);
 		free_exec_args(&t);
 		msg_error(ERR_CMD);
 		exit(127);

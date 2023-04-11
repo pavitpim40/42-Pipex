@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:36:43 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/11 16:06:20 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/11 20:31:18 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 # define ERR_ARGS "Invalid number of args.\n" 
 # define ERR_PIPE "pipe"
 # define ERR_FORK "fork"
-# define ERR_CMD "Command not found\n"
+# define ERR_CMD "command not found\n"
 
 // PIPEX
 typedef struct s_pipe
@@ -76,6 +76,7 @@ void	*ft_calloc(size_t count, size_t size);
 char	**ft_split(char const *s, char c);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
-int	ft_strncmp(const char *s1, const char *s2, size_t n);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+char	*ft_strrchr(const char *s, int c);
 
 #endif
