@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:36:43 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/11 13:36:36 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/11 15:33:23 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,9 @@
 # include	<errno.h>
 
 # define ERR_ARGS "Invalid number of args.\n" 
+# define ERR_PIPE "pipe"
+# define ERR_FORK "fork"
+# define ERR_CMD "Command not found\n"
 
 // PIPEX
 typedef struct s_pipe
@@ -52,6 +55,7 @@ typedef struct s_pipe
 	char	*execute_path;
 	char	**cmd_args;
 } t_pipe;
+
 
 // FREE
 void	free_exec_args(t_pipe *t);

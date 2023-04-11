@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 22:01:39 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 23:20:39 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/11 14:46:09 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,10 @@ void	parent_free(t_pipe *t)
 	i = 0;
 	close(t->infile);
 	close(t->outfile);
-	while (t->cmd_args[i])
+	while (t->env_path_lists[i])
 	{
-		free(t->cmd_args[i]);
+		free(t->env_path_lists[i]);
 		i++;
 	}
-	free(t->execute_path);
+	free(t->env_path_lists);
 }
