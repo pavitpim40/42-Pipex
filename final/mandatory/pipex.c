@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:45:10 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 22:12:50 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/11 13:45:16 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,9 @@ static char	*get_execute_path(char **paths, char *cmd)
 
 static void	first_child_process(t_pipe t, char **argv, char **envp)
 {
+	int r;
+	
+	r = 0;
 	close(t.pipe_fd[0]);
 	dup2(t.infile,STDIN_FILENO);
 	dup2(t.pipe_fd[1],STDOUT_FILENO);
@@ -55,15 +58,21 @@ static void	first_child_process(t_pipe t, char **argv, char **envp)
 	}
 	// printf("1st child can execve\n");
 	execve(t.execute_path, t.cmd_args  , envp);
-
+	free_exec_args(&t);
+	close(t.pipe_fd[1]);
+	
+	if(r == -1) 
+		print_error("execve");
 	// NEED TO EXIT ?
-	// close(t.pipe_fd[1]);
-	// exit(EXIT_SUCCESS);
+	exit(EXIT_SUCCESS);
 }
 
 static void	second_child_process(t_pipe t, char **argv, char **envp)
 {
 	// printf("I'm second child\n");
+	int r;
+
+	r = 0;
 	dup2(t.pipe_fd[0],STDIN_FILENO);
 	
 	close(t.pipe_fd[1]);
@@ -79,11 +88,13 @@ static void	second_child_process(t_pipe t, char **argv, char **envp)
 		msg_error("Command not found\n");
 		exit(127); // WHY 127
 	}
-	execve(t.execute_path, t.cmd_args , envp);
-	
+	r = execve(t.execute_path, t.cmd_args , envp);
+	free_exec_args(&t);
 	// NEED TO EXIT ?
-	// close(t.pipe_fd[0]);
-	// exit(EXIT_SUCCESS);
+	close(t.pipe_fd[0]);
+	if(r == -1) 
+		print_error("execve");
+	exit(EXIT_SUCCESS);
 }
 
 void	close_pipes(t_pipe *t)
@@ -101,47 +112,44 @@ int	main(int argc, char **argv, char **envp)
 
 	// INFILE
 	t.infile = open(argv[1],O_RDONLY);
-	
 	if(t.infile < 0)
-		print_error("Infile");
-	// printf("Infile Opened\n");
+		perror_and_exit(argv[1],EXIT_SUCCESS);
 	
-	// OUTFILE
+	// OUTFILE 
 	t.outfile  = open(argv[argc - 1], O_TRUNC | O_CREAT | O_RDWR, 0000644);
+	if(t.outfile < 0) 
+		perror_and_exit(argv[argc - 1],EXIT_FAILURE);
 	
-	if(t.outfile < 0)
-		print_error("Outfile");
-	// printf("Outfile Opened\n");
 	// ENV
 	t.env_path = find_path(envp);
-	// printf("ENV : %s\n",t.env_path);
 	t.env_path_lists = ft_split(t.env_path,':');
-	// printf("AFTER SPILT : %s\n",t.env_path);
-	// int i = 0;
-	// while (*(t.env_path_lists+i))
-	// {
-	// 	printf("ENV LIST : %s\n",  *(t.env_path_lists+i));
-	// 	i++;
-	// }
-	
-	// return (0);
-	// OPEN NEW PIPE
-
-	// printf("R = %d\n",r);
-	if(pipe(t.pipe_fd))
-		return msg_error("Pipe");
+	if(pipe(t.pipe_fd) < 0)
+		perror_and_exit("pipe", EXIT_FAILURE);
 
 	t.pid_first_child = fork();
-	// printf("PID FIRST CHILD %d\n", t.pid_first_child);
+	if(t.pid_first_child < 0)
+		perror_and_exit("fork", EXIT_FAILURE);
+
+
 	if (t.pid_first_child == 0) 
 		first_child_process(t,argv,envp);
 
 	t.pid_second_child = fork();
 	if(t.pid_second_child == 0)
 		second_child_process(t,argv,envp);
+
 	close_pipes(&t);
-	waitpid(t.pid_first_child, NULL,0);
-	// printf("End program");
-	waitpid(t.pid_second_child, NULL,0);
-	return(0);
+	waitpid(t.pid_first_child, &t.status,0);
+	waitpid(t.pid_second_child, &t.status,0);
+	// close(t.infile);
+	// close(t.outfile);
+		// parent_free(&t);
+	if (WEXITSTATUS(t.status) != 0) {
+
+	// printf("STATUS : %d\n",t.status);
+	exit(WEXITSTATUS(t.status));
+	}
+	
+
+	exit(EXIT_SUCCESS);
 }

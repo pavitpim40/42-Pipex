@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:36:43 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/10 22:05:04 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/11 13:36:36 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,10 @@
 // PIPEX
 typedef struct s_pipe
 {
-	pid_t	pid_in;
-	pid_t	pid_out;
 	int		pipe_fd[2];
 	int		infile;
 	int		outfile;
+	int		status;
 	pid_t	pid_first_child;
 	pid_t	pid_second_child;
 	char	*env_path;
@@ -56,10 +55,12 @@ typedef struct s_pipe
 
 // FREE
 void	free_exec_args(t_pipe *t);
+void	parent_free(t_pipe *t);
 
 // ERROR
 int msg_error(char *error);
 int	print_error(char *error);
+int	perror_and_exit(char *error,int status);
 
 // LIB_FT
 void	ft_bzero(void *s, size_t n);
