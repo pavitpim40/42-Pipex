@@ -1,40 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free.c                                             :+:      :+:    :+:   */
+/*   path.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/10 22:01:39 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/11 16:00:38 by ppimchan         ###   ########.fr       */
+/*   Created: 2023/04/11 15:41:28 by ppimchan          #+#    #+#             */
+/*   Updated: 2023/04/11 15:42:49 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-void	free_exec_args(t_pipe *t)
+char	*find_path(char **envp)
 {
-	int	i;
-
-	i = 0;
-	while (t->cmd_args[i])
-	{
-		free(t->cmd_args[i]);
-		i++;
-	}
-	free(t->cmd_args);
-	free(t->execute_path);
+	while (ft_strncmp("PATH", *envp, 4))
+		envp++;
+	return (*envp + 5);
 }
 
-void	parent_free(t_pipe *t)
+char	*get_execute_path(char **paths, char *cmd)
 {
-	int	i;
+	char	*tmp;
+	char	*command;
 
-	i = 0;
-	while (t->env_path_lists[i])
+	while (*paths)
 	{
-		free(t->env_path_lists[i]);
-		i++;
+		tmp = ft_strjoin(*paths, "/");
+		command = ft_strjoin(tmp, cmd);
+		free(tmp);
+		if (access(command, 0) == 0)
+			return (command);
+		free(command);
+		paths++;
 	}
-	free(t->env_path_lists);
+	return (NULL);
 }

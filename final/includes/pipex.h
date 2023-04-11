@@ -6,13 +6,12 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:36:43 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/11 15:33:23 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/11 16:06:20 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 # define PIPEX_H
-
 
 /* to write, read, close, access, pipe, dup, dup2, execve, fork */
 # include <unistd.h>
@@ -33,7 +32,6 @@
 
 /*to perror*/
 # include <stdio.h>
-
 # include	<errno.h>
 
 # define ERR_ARGS "Invalid number of args.\n" 
@@ -56,6 +54,13 @@ typedef struct s_pipe
 	char	**cmd_args;
 } t_pipe;
 
+// PATH
+char	*find_path(char **envp);
+char	*get_execute_path(char **paths, char *cmd);
+
+// CHILDS
+void	first_child_process(t_pipe t, char **argv, char **envp);
+void	second_child_process(t_pipe t,int argc, char **argv, char **envp);
 
 // FREE
 void	free_exec_args(t_pipe *t);
@@ -63,7 +68,6 @@ void	parent_free(t_pipe *t);
 
 // ERROR
 int msg_error(char *error);
-int	print_error(char *error);
 int	perror_and_exit(char *error,int status);
 
 // LIB_FT
