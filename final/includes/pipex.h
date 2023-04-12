@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 16:36:43 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/12 01:50:32 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/12 19:25:57 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,13 @@
 
 /*to perror*/
 # include <stdio.h>
-# include	<errno.h>
+# include <errno.h>
 
 # define ERR_ARGS "Invalid number of args.\n" 
 # define ERR_PIPE "pipe"
 # define ERR_FORK "fork"
 # define ERR_CMD "command not found"
+# define ERR_FILE "no such file or directory"
 
 // PIPEX
 typedef struct s_pipe
@@ -52,7 +53,7 @@ typedef struct s_pipe
 	char	**env_path_lists;
 	char	*execute_path;
 	char	**cmd_args;
-} t_pipe;
+}	t_pipe;
 
 // PATH
 char	*find_path(char **envp);
@@ -60,7 +61,7 @@ char	*get_execute_path(char **paths, char *cmd);
 
 // CHILDS
 void	first_child_process(t_pipe t, char **argv, char **envp);
-void	second_child_process(t_pipe t,int argc, char **argv, char **envp);
+void	second_child_process(t_pipe t, int argc, char **argv, char **envp);
 
 // FREE
 void	free_exec_args(t_pipe *t);
@@ -68,7 +69,8 @@ void	parent_free(t_pipe *t);
 
 // ERROR
 int		msg_error(char *error);
-int		perror_and_exit(char *error,int status);
+int		perror_and_exit(char *error, int status);
+int		file_error_and_exit(char *filepath, int status);
 void	cmd_error(t_pipe *t);
 
 // LIB_FT
@@ -78,6 +80,6 @@ char	**ft_split(char const *s, char c);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
-char	*ft_strrchr(const char *s, int c);
+char	*ft_strchr(const char *s, int c);
 
 #endif
