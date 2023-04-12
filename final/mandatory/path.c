@@ -6,7 +6,7 @@
 /*   By: ppimchan <ppimchan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 15:41:28 by ppimchan          #+#    #+#             */
-/*   Updated: 2023/04/12 02:00:16 by ppimchan         ###   ########.fr       */
+/*   Updated: 2023/04/12 19:19:42 by ppimchan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ char	*get_execute_path(char **paths, char *cmd)
 	char	*tmp;
 	char	*command;
 
-	if (ft_strrchr(cmd,'/') != 0 && access(cmd,0) != 0)
+	if (ft_strchr(cmd, '/') != 0 && access(cmd, 0) != 0)
 		return (NULL);
-	if (access(cmd,0) == 0)
-		return ft_strjoin(cmd, "");
+	if (access(cmd, 0) == 0)
+		return (ft_strjoin(cmd, ""));
 	while (*paths)
 	{
 		tmp = ft_strjoin(*paths, "/");
